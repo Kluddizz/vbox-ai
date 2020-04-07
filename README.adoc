@@ -1,0 +1,237 @@
+= Forschungsprojekt: Dokumentation zum Aufsetzen einer virtuellen Maschine
+Florian Hansen <flhansen.93@gmail.com>
+:toc: left
+:toc-title: Inhaltsverzeichnis
+:sectnums:
+:icons: font
+:experimental:
+
+++++
+<link rel="stylesheet"
+href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome.min.css">
+++++
+
+== Importieren der vorhandenen virtuellen Maschine
+In diesem Abschnitt soll erläutert werden, wie eine vorhandene virtuelle
+Maschine (VM) in VirtualBox importiert werden kann. Dies ist besonders für das
+Arbeiten an dem Forschungsprojekt interessant, da dafür eine eigene VM unter
+Berücksichtigung der unten aufgeführten Installationsanweisungen erstellt wurde.
+
+Zunächst sollte die dementsprechende VM heruntergeladen werden. Wie bereits
+angedeutet, wurde speziell für dieses Forschungsprojekt eine eigene virtuelle
+Maschine angelegt und exportiert. Diese wird mithilfe von
+https://drive.google.com/drive/folders/1xiqX9p5q1lDd-rDzHILmFxWfXyePeHEG[Google
+Drive] im OVA-Format zur Verfügung gestellt.
+
+Innerhalb von VirtualBox kann die heruntergeladene VM unter `+Datei / Appliance
+importieren ...+` importiert werden. Hierzu wird als Quelle _Lokales
+Dateisystem_ angegeben, als Datei die OVA-Datei ausgewählt und mit kbd:[Weiter]
+bestätigt. Die nun angezeigten Einstellungen können übernommen werden und mit
+kbd:[Importieren] importiert werden. Danach kann die VM gestartet werden.
+
+NOTE: Die nun folgenden Installationsanweisungen müssen beim Verwenden der zur
+Verfügung gestellten VM nicht durchgeführt werden. Diese wurden beim Erstellen
+des Systems bereits ausgeführt.
+
+== Erstellen einer neuen virtuellen Maschine
+In diesem Abschnitt wird auf die Installation einer neuen virtuellen Maschine
+eingegangen.
+
+WARNING: Bei der Verwendung von VirtualBox auf Windows 10 Pro kann es zu
+Komplikationen mit Hyper-V kommen. Ein Deaktivieren von Hyper-V ist daher
+sinnvoll.
+https://www.isunshare.com/blog/how-to-disable-or-turn-off-hyper-v-in-windows-10-four-options/[Hier]
+sind einige Optionen beschrieben, um Hyper-V zu deaktivieren.
+
+=== Herunterladen der Linux Mint Distribution
+Unter der https://linuxmint.com/download.php[Linux Mint Download Seite] können
+die aktuellsten Versionen der Linux Distributionen für Linux Mint als `+.iso+`
+Dateien heruntergeladen werden. Für das Aufsetzen dieser VM wurde Linux Mint
+19.3 MATE (64-bit) verwendet.
+
+=== Erzeugen einer neuen virtuellen Maschine
+Im Hauptfenster von VirtualBox klicken wir auf die Schaltfläche kbd:[Neu].
+Anschließend vergeben wir der neuen VM einen Namen. In diesem Fall _AI
+Research_. Als Typ wählen wir _Linux_ Version _Ubuntu (64-bit)_ und bestätigen
+mit kbd:[Weiter].
+
+Im nächsten Dialog weisen wir der VM den zur Verfügung stehenden RAM zu. Für
+Linux Mint wird auf der https://linuxmint.com/[Homepage] empfohlen, als
+Mindeswert 1024 MB RAM zuzuordnen. Wir weisen der VM _2048 GB_ RAM zu und
+bestätigen mit kbd:[Weiter].
+
+Im Anschluss wählen wir _Festplatte erzeugen_ aus und fahren mit
+kbd:[Erzeugen] fort.
+
+Als Dateityp verwenden wir _VDI_ (VirtualBox Disc Image)
+und klicken auf kbd:[Weiter].
+
+Als Speicherungsart wählen wir _dynamisch alloziert_. Der Unterschied zu _feste
+Größe_ besteht darin, dass bei einer festen Vergebung des Festplattenspeichers
+die eingestellte Menge auf dem Hostsystem angefordert und beschrieben wird. Auch
+dann, wenn sich nichts auf der VM befindet. Dies ist zwar im Allgemeinen etwas
+performanter als die verwendung eines dynamischen Speichers, jedoch ist der
+Unterschied auf modernen Systemen kaum bemerkbar. Das Verwenden eines dynamisch
+allozierten Speichers hat den Vorteil, dass ledglich so viel Speicher auf dem
+Hostsystem belegt wird, wie die VM verwendet. Wir bestätigen mit kbd:[Weiter].
+
+Als nächstes wird nach der Festplattengröße gefragt. Die Mindestgröße für die
+Installation von Linux Mint beträgt 10,7 GB. Zu Empfehlen ist ein Wert
+von 20 GB oder mehr. Wir setzen den Wert auf _50 GB_ und bestätigen mit
+kbd:[Erzeugen]. Im Anschluss wird unsere VM erzeugt und in der Übersicht von
+VirtualBox angezeigt.
+
+=== Konfigurieren der VM
+Nachdem wir eine neue VM erzeugt haben, müssen wir diese konfigurieren, um zum
+Einen die Performance zu verbessern und zum Anderen das Netzwerk einzustellen.
+Letzteres ist nötig, da ansonsten Anwendungen wie Pythons Paketmanager `+pip+`
+Probleme mit dem Installieren neuer Pakete haben und fehlerhafte Prüfsummen
+erzeugen.
+
+Als erstes werden der VM mehr Hardware-Ressourcen zugewiesen. Dafür wählen wir
+die dementsprechende VM in der Übersicht von VirtualBox aus und klicken auf die
+Schaltfläche kbd:[Ändern]. In den Einstellungen unter `+System / Prozessor+`
+können wir die Anzahl der CPU-Kerne auswählen, die der VM zur Verfügung stehen.
+Wir ändern den Wert auf _2_, um der VM zwei Kerne zur Verfügung zu stellen.
+
+Unter `+Anzeige / Bildschirm+` ändern wir den Grafik-Controller von _VMSVGA_ auf
+_VBoxVGA_.
+
+Als letztes werden Einstellungen am Netzwerkadapter vorgenommen. Unter
+`+Netzwerk / Adapter 1+` ändern wir den Adapter von `+NAT+` auf
+`+Netzwerkbrücke+`. Als Name der Netzwerkkarte wird standardmäßig die des Hosts
+ausgewählt. Dies belassen wir dabei.
+
+Durch einen Klick auf kbd:[OK] übernehmen wir die Einstellungen und schließen die
+Konfiguration ab.
+
+=== Installieren des Betriebssystems
+Falls die VM zum ersten Mal gestartet wird, wird nach einem Medium zum Booten
+gefragt. Hier wählen wir die vorher heruntergeladene `+.iso+` Datei aus und
+starten die VM. Nachdem das System gebootet wurde, können wir das Betriebssystem
+installieren.
+
+NOTE: Die Installationsvorgänge zwischen den Linux-Distributionen unterscheiden
+sich voneinander. Hier wird sich lediglich auf die Installation von Linux Mint
+bezogen.
+
+Auf dem Desktop von Linux Mint finden wir den Installer _Install Linux Mint_.
+Nach einem Doppelklick öffnet sich der Installationsassistent. Als Sprache
+wählen wir _English_ und bestätigen mit kbd:[Continue].
+
+Im nächsten Fenster werden wir nach dem zu verwendenden Tastaturlayout gefragt.
+Dort wählen wir _German_ und klicken auf kbd:[Continue].
+
+Nun haben wir die Möglichkeit Drittanbieter-Software automatisch mit zu
+installieren. Dies bestätigen wir mit dem Setzen des Hakens und klicken auf
+kbd:[Continue].
+
+Im Anschluss wählen wir aus den Optionen _Erase disk and install Linux Mint_ und
+installieren das Betriebssystem mit kbd:[Install Now].
+
+Nach der Installation werden wir aufgefordert, das System neu zu starten.
+
+=== Gasterweiterungen installieren
+Um Gerätetreiber zu installieren, müssen die Gasterweiterungen installiert
+werden. Diese können über `+Geräte / Gasterweiterungen einlegen+` zur Verfügung
+gestellt werden. Nach dem Einlegen erscheint ein Datenträger mit dem Bezeichner
+`+VBox_GAs_6.1.4+` auf dem Desktop. Im Terminal wechseln wir das Verzeichnis in
+den Datenträger mithilfe des folgenden Kommandos.
+
+----
+$ cd /media/<user>/VBox_GAs_6.1.4
+----
+
+Der Parameter `+<user>+` muss dabei mit dem angemeldeten Benutzernamen ersetzt
+werden. Im Anschluss können die Erweiterungen installiert werden.
+
+----
+$ sudo ./VBoxLinuxAdditions.run
+----
+
+Danach muss das System neu gestartet werden.
+
+----
+$ reboot
+----
+
+== Installieren der Entwicklungsumgebung
+In diesem Abschnitt wird beschrieben, wie eine Python-Entwicklungsumgebung mit
+TensorFlow aufgesetzt wird.
+
+[[install-python]]
+=== Installieren von Python
+Zunächst wird `+apt+` aktualisiert.
+
+----
+$ sudo apt update
+----
+
+Dann prüfen wir, ob Python installiert ist.
+
+----
+$ python3 -V
+----
+
+Die Ausgabe sollte die Version von Python anzeigen. Falls nicht, installieren
+wir Python.
+
+----
+$ sudo apt install python3
+----
+
+Als nächstes installieren wir das Paketverwaltungssystem von Python: `+pip+`.
+Anschließend aktualisieren wir `+pip+` auf die aktuellste Version.
+
+----
+$ sudo apt install python3-pip
+$ python3 -m pip install --upgrade pip
+----
+
+NOTE: Das Installieren von Python Pakete mittels `+pip3 install <package>+` wird
+in Zukunft nicht mehr unterstützt. Die sichere Variante ist `+python3 -m pip
+install <package>+`. 
+
+Nachdem `+pip+` verfügbar ist, installieren wir die restlichen Tools zum
+Entwickeln innerhalb einer virtuellen Python Umgebung.
+
+----
+$ python3 -m pip install --upgrade setuptools
+$ python3 -m pip install --upgrade wheel
+$ python3 -m pip install --upgrade virtualenv
+----
+
+Damit stehen uns nun alle Tools zur Verfügung, um mit Python zu entwickeln.
+
+=== Aufsetzen einer TensorFlow-Entwicklungsumgebung
+Die folgenden Schritte setzen jene aus dem Abschnitt <<install-python>> voraus.
+Als erstes erstellen wir eine neue Python Umgebung. Dafür verwenden wir
+`+virtualenv+`.
+
+----
+$ python3 -m virtualenv --system-site-packages -p python3 ~/ai-venv
+----
+
+Dies erstellt uns eine neue virtuelle Python-Umgebung im Home-Verzeichnis unter
+dem Namen `+ai-venv+`. Wir können Die Umgebung aktivieren, indem wir folgendes
+Kommando eingeben.
+
+----
+$ source ~/ai-venv/bin/activate
+----
+
+Im Anschluss können wir TensorFlow innerhalb der Umgebung installieren.
+
+----
+(ai-venv) $ pip install --upgrade tensorflow
+----
+
+Die Umgebung ist nun fertig eingerichtet. Wenn wir fertig mit der Entwicklung
+sind, können wir die Umgebung wieder verlassen.
+
+----
+(ai-venv) $ deactivate
+----
+
+NOTE: Innerhalb der Python-Umgebung kann `+pip install ...+` anstatt `+python3 -m
+pip install ...+` verwendet werden.
